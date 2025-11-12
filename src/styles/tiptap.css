@@ -1,0 +1,64 @@
+/* TipTap Editor Styles */
+.comment-editor {
+  outline: none;
+  min-height: 100px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.comment-editor p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.comment-editor p {
+  margin-bottom: 0.5em;
+}
+
+.comment-editor p:last-child {
+  margin-bottom: 0;
+}
+
+.comment-editor ul,
+.comment-editor ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.comment-editor code {
+  background-color: rgba(0, 0, 0, 0.08);
+  padding: 0.125em 0.25em;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+}
+
+.comment-editor strong {
+  font-weight: 600;
+}
+
+.comment-editor em {
+  font-style: italic;
+}
+
+.mention {
+  background-color: rgba(25, 118, 210, 0.1);
+  color: #1976d2;
+  border-radius: 4px;
+  padding: 0.125em 0.25em;
+  font-weight: 600;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .comment-editor code {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .mention {
+  background-color: rgba(25, 118, 210, 0.2);
+  color: #64b5f6;
+}
