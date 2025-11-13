@@ -16,6 +16,7 @@ import SignUp from './components/userManagement/SignUp';
 // Lazy-loaded route components
 const Dashboard = lazy(() => import('./components/dashboardAndAnalytics/Dashboard'));
 const TasksView = lazy(() => import('./components/taskManagement/TasksView'));
+const TaskDetailPage = lazy(() => import('./components/tasks/TaskDetailPage'));
 const BacklogView = lazy(() => import('./components/taskManagement/BacklogView'));
 const ProjectsView = lazy(() => import('./components/projectManagement/ProjectsView'));
 const ProjectDetailsPage = lazy(() => import('./components/projectManagement/ProjectDetailsPage'));
@@ -103,6 +104,7 @@ function App() {
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/tasks" element={<TasksView />} />
+                      <Route path="/tasks/:taskKey" element={<TaskDetailPage />} />
                       <Route path="/backlog" element={<BacklogView />} />
                       <Route path="/projects" element={<ProjectsView />} />
                       <Route path="/projects/:projectId" element={<ProjectDetailsPage />} />

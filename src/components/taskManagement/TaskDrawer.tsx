@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import {
   Box,
   Typography,
@@ -43,6 +44,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import AddIcon from '@mui/icons-material/Add';
 import {
   useTask,
+  useTaskByKey,
   useUpdateTask,
   useDeleteTask,
   useAssignTask,
@@ -68,11 +70,13 @@ import UserAvatar from '../misc/UserAvatar';
 import { RichTextEditor, type User } from '../misc/RichTextEditor';
 
 interface TaskDrawerProps {
-  taskId: number | null;
+  taskId?: number | null;
+  taskKey?: string | null; // Alternative to taskId - fetch by key
   projectId: number | null;
   organizationId: number | null;
   open: boolean;
   onClose: () => void;
+  asPage?: boolean; // When true, renders as page content instead of dialog
 }
 
 const typeIcons: Record<TaskType, React.ReactNode> = {
@@ -89,20 +93,36 @@ const priorityColors: Record<TaskPriority, string> = {
   CRITICAL: '#d32f2f',
 };
 
-const TaskDrawer = ({ taskId, projectId, organizationId, open, onClose }: TaskDrawerProps) => {
-  const { data: task, isLoading } = useTask(taskId);
-  const { data: statuses } = useProjectStatuses(projectId);
-  const { data: members } = useProjectMembers(projectId);
+const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose, asPage = false }: TaskDrawerProps) => {
+  const navigate = useNavigate();
+
+  // Fetch task by ID or by Key depending on what's provided
+  const { data: taskById, isLoading: isLoadingById } = useTask(taskId || null);
+  const { data: taskByKey, isLoading: isLoadingByKey } = useTaskByKey(
+    organizationId || null,
+    taskKey || null
+  );
+
+  // Use whichever fetch method was requested
+  const task = taskKey ? taskByKey : taskById;
+  const isLoading = taskKey ? isLoadingByKey : isLoadingById;
+
+  // Extract actual taskId for related queries
+  const actualTaskId = task?.id || taskId || null;
+  const actualProjectId = task?.projectId || projectId || null;
+
+  const { data: statuses } = useProjectStatuses(actualProjectId);
+  const { data: members } = useProjectMembers(actualProjectId);
   const { data: organizationLabels } = useOrganizationLabels(organizationId);
-  const { data: taskLabels } = useTaskLabels(taskId);
-  const { data: subtasks } = useSubtasks(taskId);
+  const { data: taskLabels } = useTaskLabels(actualTaskId);
+  const { data: subtasks } = useSubtasks(actualTaskId);
 
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
   const assignTask = useAssignTask();
   const transitionTask = useTransitionTask();
-  const addLabel = useAddLabel(taskId || 0);
-  const removeLabel = useRemoveLabel(taskId || 0);
+  const addLabel = useAddLabel(actualTaskId || 0);
+  const removeLabel = useRemoveLabel(actualTaskId || 0);
   const assignToSprint = useAssignTasksToSprint();
   const removeFromSprint = useRemoveTasksFromSprint();
 
@@ -297,30 +317,13 @@ const TaskDrawer = ({ taskId, projectId, organizationId, open, onClose }: TaskDr
 
   const selectedMember = members?.find((m) => m.userId === task?.assigneeId);
 
-  if (!open) return null;
+  if (!open && !asPage) return null;
 
-  return (
-    <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        maxWidth="md"
-        fullWidth
-        scroll="paper"
-        slotProps={{
-          paper: {
-            sx: {
-              mt: { xs: '64px', sm: '92px' }, // offset for your fixed AppBar
-              maxHeight: { xs: 'calc(100vh - 120px)', sm: 'calc(100vh - 120px)' },
-            },
-          },
-        }}
-      >
-        {isLoading ? (
-          <Box display="flex" justifyContent="center" alignItems="center" height="400px">
-            <CircularProgress />
-          </Box>
-        ) : task ? (
+  const taskContent = isLoading ? (
+    <Box display="flex" justifyContent="center" alignItems="center" height="400px">
+      <CircularProgress />
+    </Box>
+  ) : task ? (
           <>
             {/* Header */}
             <DialogTitle sx={{ pb: 2 }}>
@@ -333,15 +336,22 @@ const TaskDrawer = ({ taskId, projectId, organizationId, open, onClose }: TaskDr
                         {typeIcons[task.type]}
                       </Box>
                     </Tooltip>
-                    <Chip
-                      label={task.key}
-                      size="small"
-                      sx={{
-                        fontWeight: 700,
-                        fontFamily: 'monospace',
-                        fontSize: '0.875rem',
-                      }}
-                    />
+                    <Tooltip title="Open in new page" arrow>
+                      <Chip
+                        label={task.key}
+                        size="small"
+                        onClick={() => navigate(`/tasks/${task.key}`)}
+                        sx={{
+                          fontWeight: 700,
+                          fontFamily: 'monospace',
+                          fontSize: '0.875rem',
+                          cursor: 'pointer',
+                          '&:hover': {
+                            bgcolor: 'action.hover',
+                          },
+                        }}
+                      />
+                    </Tooltip>
                     <Chip
                       label={task.priority}
                       size="small"
@@ -876,8 +886,33 @@ const TaskDrawer = ({ taskId, projectId, organizationId, open, onClose }: TaskDr
           <Box p={3}>
             <Typography color="text.secondary">Task not found</Typography>
           </Box>
-        )}
-      </Dialog>
+        );
+
+  return (
+    <>
+      {asPage ? (
+        // Render as page content
+        <Box>{taskContent}</Box>
+      ) : (
+        // Render as dialog
+        <Dialog
+          open={open}
+          onClose={onClose}
+          maxWidth="md"
+          fullWidth
+          scroll="paper"
+          slotProps={{
+            paper: {
+              sx: {
+                mt: { xs: '64px', sm: '92px' }, // offset for your fixed AppBar
+                maxHeight: { xs: 'calc(100vh - 120px)', sm: 'calc(100vh - 120px)' },
+              },
+            },
+          }}
+        >
+          {taskContent}
+        </Dialog>
+      )}
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
