@@ -15,14 +15,8 @@ export const NotificationType = {
 
 export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
 
-// Actor information in notifications
-export interface NotificationActor {
-  id: number;
-  name: string;
-  email: string;
-}
+import type { UserSummary } from './common.types';
 
-// Notification response matching backend NotificationResponse DTO
 export interface NotificationResponse {
   id: number;
   userId: number;
@@ -31,7 +25,7 @@ export interface NotificationResponse {
   read: boolean;
   readAt: string | null;
   createdAt: string;
-  actor: NotificationActor | null;
+  actor: UserSummary | null;
   organizationId: number | null;
   organizationName: string | null;
   projectId: number | null;
@@ -52,18 +46,12 @@ export interface NotificationMessage {
   timestamp: string;
 }
 
-// Activity log entry matching backend ActivityLogResponse
 export interface ActivityLogEntry {
   id: number;
   entityType: string;
   entityId: number;
   action: string;
-  user: {
-    id: number;
-    username: string;
-    email: string;
-    fullName?: string | null;
-  };
+  user: UserSummary;
   fieldName: string | null;
   oldValue: string | null;
   newValue: string | null;

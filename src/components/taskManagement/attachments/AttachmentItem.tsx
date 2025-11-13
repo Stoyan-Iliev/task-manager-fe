@@ -252,7 +252,9 @@ const AttachmentItemComponent = ({
                     •
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {attachment.uploadedBy.fullName || attachment.uploadedBy.username}
+                    {attachment.uploadedBy.firstName && attachment.uploadedBy.lastName
+                      ? `${attachment.uploadedBy.firstName} ${attachment.uploadedBy.lastName}`
+                      : attachment.uploadedBy.username}
                   </Typography>
                 </>
               )}

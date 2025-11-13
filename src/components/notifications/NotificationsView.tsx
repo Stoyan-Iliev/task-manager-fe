@@ -220,7 +220,9 @@ const NotificationsView: React.FC = () => {
                             />
                             {notif.actor && (
                               <Typography variant="caption" color="text.secondary">
-                                by {notif.actor.name}
+                                by {notif.actor.firstName && notif.actor.lastName
+                                  ? `${notif.actor.firstName} ${notif.actor.lastName}`
+                                  : notif.actor.username}
                               </Typography>
                             )}
                           </Stack>

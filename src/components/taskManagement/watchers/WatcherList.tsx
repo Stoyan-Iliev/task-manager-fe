@@ -127,7 +127,11 @@ export const WatcherList = ({ taskId }: WatcherListProps) => {
                   <WatcherAvatar user={watcher} size="medium" />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={watcher.fullName || watcher.username}
+                  primary={
+                    watcher.firstName && watcher.lastName
+                      ? `${watcher.firstName} ${watcher.lastName}`
+                      : watcher.username
+                  }
                   secondary={watcher.email}
                   primaryTypographyProps={{ fontWeight: 500 }}
                   secondaryTypographyProps={{ noWrap: true }}

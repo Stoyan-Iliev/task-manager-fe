@@ -64,6 +64,7 @@ import SprintSelector from './SprintSelector';
 import { useAssignTasksToSprint, useRemoveTasksFromSprint } from '../../api/sprints';
 import { CommitHistory } from '../gitIntegration/CommitHistory';
 import { PullRequestList } from '../gitIntegration/PullRequestList';
+import UserAvatar from '../misc/UserAvatar';
 
 interface TaskDrawerProps {
   taskId: number | null;
@@ -493,7 +494,11 @@ const TaskDrawer = ({ taskId, projectId, organizationId, open, onClose }: TaskDr
                 </Typography>
                 <Autocomplete
                   options={members || []}
-                  getOptionLabel={(option) => option.fullName || option.username || 'Unknown'}
+                  getOptionLabel={(option) =>
+                    option.firstName && option.lastName
+                      ? `${option.firstName} ${option.lastName}`
+                      : option.username || 'Unknown'
+                  }
                   value={selectedMember || null}
                   onChange={(_, newValue) => {
                     handleAssigneeChange(newValue?.userId || null);
@@ -504,17 +509,20 @@ const TaskDrawer = ({ taskId, projectId, organizationId, open, onClose }: TaskDr
                   renderOption={(props, option) => (
                     <li {...props}>
                       <Box display="flex" alignItems="center" gap={1}>
-                        <Avatar
-                          sx={{
-                            width: 24,
-                            height: 24,
-                            fontSize: '0.75rem',
-                            bgcolor: 'primary.main',
-                          }}
-                        >
-                          {(option.fullName || option.username).charAt(0).toUpperCase()}
-                        </Avatar>
-                        <Typography variant="body2">{option.fullName || option.username}</Typography>
+                        <UserAvatar
+                          userId={option.userId}
+                          username={option.username}
+                          firstName={option.firstName}
+                          lastName={option.lastName}
+                          avatarUrl={option.avatarUrl}
+                          size="small"
+                          showTooltip={false}
+                        />
+                        <Typography variant="body2">
+                          {option.firstName && option.lastName
+                            ? `${option.firstName} ${option.lastName}`
+                            : option.username}
+                        </Typography>
                       </Box>
                     </li>
                   )}
@@ -772,11 +780,21 @@ const TaskDrawer = ({ taskId, projectId, organizationId, open, onClose }: TaskDr
                 <Collapse in={metadataExpanded}>
                   <Box mt={1} sx={{ bgcolor: 'action.hover', p: 1.5, borderRadius: 1 }}>
                     <Stack spacing={1}>
-                      <Box display="flex" justifyContent="space-between">
+                      <Box display="flex" justifyContent="space-between" alignItems="center">
                         <Typography variant="caption" color="text.secondary">
                           Created by:
                         </Typography>
-                        <Typography variant="caption">{task.reporter.fullName || task.reporter.username}</Typography>
+                        <Box display="flex" alignItems="center" gap={0.5}>
+                          <UserAvatar
+                            userId={task.reporter.id}
+                            username={task.reporter.username}
+                            firstName={task.reporter.firstName}
+                            lastName={task.reporter.lastName}
+                            avatarUrl={task.reporter.avatarUrl}
+                            size="small"
+                            showTooltip={true}
+                          />
+                        </Box>
                       </Box>
                       <Box display="flex" justifyContent="space-between">
                         <Typography variant="caption" color="text.secondary">

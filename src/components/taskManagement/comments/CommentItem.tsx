@@ -1,7 +1,6 @@
 import { useState, memo } from 'react';
 import {
   Box,
-  Avatar,
   Typography,
   IconButton,
   Stack,
@@ -14,6 +13,7 @@ import { CommentForm } from './CommentForm';
 import { formatDistanceToNow } from 'date-fns';
 import type { CommentResponse } from '../../../types/task.types';
 import type { ProjectMemberResponse } from '../../../types/project.types';
+import UserAvatar from '../../misc/UserAvatar';
 
 interface CommentItemProps {
   comment: CommentResponse;
@@ -61,19 +61,15 @@ const CommentItemComponent = ({
   return (
     <Box sx={{ mb: 2 }}>
       <Stack direction="row" spacing={1.5} alignItems="flex-start">
-        {/* Avatar */}
-        <Avatar
-          sx={{
-            width: depth === 0 ? 32 : 28,
-            height: depth === 0 ? 32 : 28,
-            bgcolor: 'primary.main',
-            fontSize: depth === 0 ? '0.875rem' : '0.75rem',
-          }}
-        >
-          {comment.author
-            ? (comment.author.fullName || comment.author.username).charAt(0).toUpperCase()
-            : '?'}
-        </Avatar>
+        <UserAvatar
+          userId={comment.author?.id}
+          username={comment.author?.username}
+          firstName={comment.author?.firstName}
+          lastName={comment.author?.lastName}
+          avatarUrl={comment.author?.avatarUrl}
+          size={depth === 0 ? 'medium' : 'small'}
+          showTooltip={false}
+        />
 
         <Box flex={1}>
           {/* Header */}
@@ -84,7 +80,9 @@ const CommentItemComponent = ({
             sx={{ mb: 0.5 }}
           >
             <Typography variant="subtitle2" fontWeight={600}>
-              {comment.author?.fullName || comment.author?.username || 'Unknown'}
+              {comment.author?.firstName && comment.author?.lastName
+                ? `${comment.author.firstName} ${comment.author.lastName}`
+                : comment.author?.username || 'Unknown'}
             </Typography>
             {comment.createdAt && (
               <Typography variant="caption" color="text.secondary">

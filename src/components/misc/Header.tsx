@@ -19,11 +19,14 @@ import NotificationsDialog from '../notifications/NotificationsDialog';
 import { useAuth } from '../../hooks/useAuth';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ColorModeContext } from "../../theme/ThemeContext";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import PersonIcon from '@mui/icons-material/Person';
+import SettingsIcon from '@mui/icons-material/Settings';
 import OrganizationSwitcher from '../organization/OrganizationSwitcher';
+import { getAvatarUrl, getUserInitials } from '../../util/avatarUtils';
 
 type HeaderProps = {
   onToggleSidebar: () => void;
@@ -34,12 +37,30 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
   const theme = useTheme();
   const user = useSelector((state: RootState) => state.user.details);
   const { logout: performLogout } = useAuth();
-  const firstLetter = user?.username.charAt(0).toUpperCase();
+  const [avatarSrc, setAvatarSrc] = useState<string | undefined>(undefined);
+  const initials = getUserInitials(user?.firstName, user?.lastName, user?.username);
 
   const { mode, toggleColorMode } = useContext(ColorModeContext);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadAvatar = async () => {
+      const url = await getAvatarUrl(user?.id, user?.avatarUrl);
+      if (mounted) {
+        setAvatarSrc(url);
+      }
+    };
+
+    loadAvatar();
+
+    return () => {
+      mounted = false;
+    };
+  }, [user?.id, user?.avatarUrl]);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -55,13 +76,13 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
     // Navigation is handled by useAuth hook
   }
 
-  const handlePath1Click = () => {
-    navigate(`/path1`);
+  const handleProfileClick = () => {
+    navigate(`/profile`);
     handleMenuClose();
   }
 
-  const handlePath2Click = () => {
-    navigate(`/path2`);
+  const handleSettingsClick = () => {
+    navigate(`/settings`);
     handleMenuClose();
   }
 
@@ -118,11 +139,11 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
           aria-haspopup="true"
           onClick={handleProfileMenuOpen}
         >
-          <Avatar 
-            src={user?.profilePic}
+          <Avatar
+            src={avatarSrc}
             sx={{ bgcolor: 'rgb(144, 202, 249)' }}
           >
-            {firstLetter}
+            {initials}
           </Avatar>
         </IconButton>
       </Toolbar>
@@ -140,8 +161,8 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         }}
       >
         <Stack direction="row" sx={{ padding: 1, gap: 1 }}>
-          <Avatar src={user?.profilePic} sx={{ bgcolor: theme.palette.primary.main}}>
-            {firstLetter}
+          <Avatar src={avatarSrc} sx={{ bgcolor: theme.palette.primary.main}}>
+            {initials}
           </Avatar>
           <Box sx={{ mr: 'auto' }}>
             <Typography>{user?.username}</Typography>
@@ -151,8 +172,18 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
           </Box>
         </Stack>
         <Divider />
-        <MenuItem onClick={handlePath1Click}>Path 1</MenuItem>
-        <MenuItem onClick={handlePath2Click}>Path 2</MenuItem>
+        <MenuItem onClick={handleProfileClick}>
+          <ListItemIcon>
+            <PersonIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Profile</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleSettingsClick}>
+          <ListItemIcon>
+            <SettingsIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Settings</ListItemText>
+        </MenuItem>
         <Divider />
         <MenuItem
           onClick={handleLogout}

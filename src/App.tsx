@@ -25,6 +25,7 @@ const SprintDetails = lazy(() => import('./components/projectManagement/SprintDe
 const TeamView = lazy(() => import('./components/teamCoordination/TeamView'));
 const ReleasesView = lazy(() => import('./components/projectManagement/ReleasesView'));
 const SettingsView = lazy(() => import('./components/settingsAndAdmin/SettingsView'));
+const UserSettingsPage = lazy(() => import('./components/settingsAndAdmin/UserSettingsPage'));
 const OrganizationSettings = lazy(() => import('./components/settingsAndAdmin/OrganizationSettings'));
 const SearchView = lazy(() => import('./components/misc/SearchView'));
 const NotificationsView = lazy(() => import('./components/notifications/NotificationsView'));
@@ -111,6 +112,7 @@ function App() {
                       <Route path="/team" element={<TeamView />} />
                       <Route path="/releases" element={<ReleasesView />} />
                       <Route path="/settings" element={<SettingsView />} />
+                      <Route path="/profile" element={<UserSettingsPage />} />
                       <Route path="/organizations/:id/settings" element={<OrganizationSettings />} />
                       <Route path="/search" element={<SearchView />} />
                       <Route path="/notifications" element={<NotificationsView />} />

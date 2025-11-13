@@ -62,7 +62,9 @@ export interface ProjectMemberResponse {
   userId: number;
   username: string;
   email: string;
-  fullName: string | null;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
   role: ProjectRole;
   addedAt: string;
 }

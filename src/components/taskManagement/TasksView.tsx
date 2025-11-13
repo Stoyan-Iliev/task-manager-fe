@@ -58,6 +58,7 @@ import LabelIcon from '@mui/icons-material/Label';
 import EventIcon from '@mui/icons-material/Event';
 import TaskDrawer from './TaskDrawer';
 import CreateTaskDialog from './CreateTaskDialog';
+import UserAvatar from '../misc/UserAvatar';
 import { useProjectTasks, useTransitionTask } from '../../api/tasks';
 import { useProjectStatuses } from '../../api/taskStatuses';
 import { useProjectMembers } from '../../api/projectMembers';
@@ -634,19 +635,15 @@ const TasksView = () => {
           {/* Footer: Assignee + Counts */}
           <Box display="flex" justifyContent="space-between" alignItems="center">
             {task.assignee ? (
-              <Tooltip title={task.assignee.fullName || task.assignee.username} arrow>
-                <Avatar
-                  sx={{
-                    width: 24,
-                    height: 24,
-                    fontSize: '0.75rem',
-                    bgcolor: 'primary.main',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {(task.assignee.fullName || task.assignee.username).charAt(0).toUpperCase()}
-                </Avatar>
-              </Tooltip>
+              <UserAvatar
+                userId={task.assignee.id}
+                username={task.assignee.username}
+                firstName={task.assignee.firstName}
+                lastName={task.assignee.lastName}
+                avatarUrl={task.assignee.avatarUrl}
+                size="small"
+                showTooltip={true}
+              />
             ) : (
               <Tooltip title="Unassigned" arrow>
                 <Avatar

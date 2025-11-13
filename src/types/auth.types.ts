@@ -8,25 +8,37 @@ export interface SignUpRequest {
   username: string;
   email: string;
   password: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface UserInfo {
+  id: number;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  roles: string[];
 }
 
 export interface UserResponse {
   id: number;
   username: string;
   email: string;
-  fullName?: string;
-  profilePic?: string;
-  roles?: string[];
-  createdAt: string;
-  updatedAt: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  tsCreated: string;
+  tsUpdated: string;
 }
 
 export interface TokenResponse {
   accessToken: string;
   refreshToken: string;
-  user: UserResponse;
-  tokenType?: string;
-  expiresIn?: number;
+  tokenType: string;
+  expiresIn: number;
+  scope: string;
+  user: UserInfo;
 }
 
 export interface RefreshRequest {
@@ -42,4 +54,8 @@ export interface User {
   id: number;
   username: string;
   email: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  roles?: string[];
 }
