@@ -238,19 +238,18 @@ async function createComment(
 }
 
 async function updateComment(
-  taskId: number,
   commentId: number,
   data: CommentRequest
 ): Promise<CommentResponse> {
-  const response = await apiClient.patch<ApiResponse<CommentResponse>>(
-    `/api/secure/tasks/${taskId}/comments/${commentId}`,
+  const response = await apiClient.put<ApiResponse<CommentResponse>>(
+    `/api/secure/comments/${commentId}`,
     data
   );
   return response.data.data;
 }
 
-async function deleteComment(taskId: number, commentId: number): Promise<void> {
-  await apiClient.delete(`/api/secure/tasks/${taskId}/comments/${commentId}`);
+async function deleteComment(commentId: number): Promise<void> {
+  await apiClient.delete(`/api/secure/comments/${commentId}`);
 }
 
 // Attachments
@@ -693,7 +692,7 @@ export function useUpdateComment(taskId: number) {
 
   return useMutation({
     mutationFn: ({ commentId, data }: { commentId: number; data: CommentRequest }) =>
-      updateComment(taskId, commentId, data),
+      updateComment(commentId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.comments(taskId) });
     },
@@ -704,7 +703,7 @@ export function useDeleteComment(taskId: number) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (commentId: number) => deleteComment(taskId, commentId),
+    mutationFn: (commentId: number) => deleteComment(commentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.comments(taskId) });
       queryClient.invalidateQueries({ queryKey: taskKeys.detail(taskId) });

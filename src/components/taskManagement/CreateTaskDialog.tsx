@@ -29,6 +29,7 @@ import { useProjectMembers } from '../../api/projectMembers';
 import type { TaskType, TaskPriority } from '../../types/task.types';
 import SprintSelector from './SprintSelector';
 import { useAssignTasksToSprint } from '../../api/sprints';
+import { RichTextEditor, type User } from '../misc/RichTextEditor';
 
 interface CreateTaskDialogProps {
   open: boolean;
@@ -281,16 +282,26 @@ const CreateTaskDialog = ({
         </Box>
 
         {/* Description */}
-        <TextField
-          label="Description"
-          fullWidth
-          multiline
-          rows={4}
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          sx={{ mb: 2 }}
-          placeholder="Enter task description..."
-        />
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Description
+          </Typography>
+          <RichTextEditor
+            content={formData.description}
+            onChange={(content) => setFormData({ ...formData, description: content })}
+            placeholder="Enter task description..."
+            users={
+              members?.map((member): User => ({
+                id: member.userId,
+                username: member.username || '',
+                fullName: member.fullName || member.username || 'Unknown',
+              })) || []
+            }
+            minHeight={120}
+            maxHeight={250}
+            showTaskList={true}
+          />
+        </Box>
 
         {/* Status */}
         <FormControl fullWidth sx={{ mb: 2 }} error={!!errors.statusId} required>

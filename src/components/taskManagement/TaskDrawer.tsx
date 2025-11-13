@@ -65,6 +65,7 @@ import { useAssignTasksToSprint, useRemoveTasksFromSprint } from '../../api/spri
 import { CommitHistory } from '../gitIntegration/CommitHistory';
 import { PullRequestList } from '../gitIntegration/PullRequestList';
 import UserAvatar from '../misc/UserAvatar';
+import { RichTextEditor, type User } from '../misc/RichTextEditor';
 
 interface TaskDrawerProps {
   taskId: number | null;
@@ -447,20 +448,57 @@ const TaskDrawer = ({ taskId, projectId, organizationId, open, onClose }: TaskDr
 
               {/* Description */}
               <Box mb={2}>
-                <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
-                  Description
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Description
+                  </Typography>
+                  {!editingDescription && (
+                    <Button
+                      size="small"
+                      onClick={() => setEditingDescription(true)}
+                      sx={{ textTransform: 'none', fontSize: '0.75rem' }}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </Box>
                 {editingDescription ? (
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={6}
-                    value={descriptionValue}
-                    onChange={(e) => setDescriptionValue(e.target.value)}
-                    onBlur={handleUpdateDescription}
-                    placeholder="Add a description..."
-                    autoFocus
-                  />
+                  <Box sx={{ position: 'relative' }}>
+                    <RichTextEditor
+                      content={descriptionValue}
+                      onChange={setDescriptionValue}
+                      placeholder="Add a description..."
+                      users={
+                        members?.map((member): User => ({
+                          id: member.userId,
+                          username: member.username || '',
+                          fullName: member.fullName || member.username || 'Unknown',
+                        })) || []
+                      }
+                      autoFocus={true}
+                      minHeight={150}
+                      maxHeight={400}
+                      showTaskList={true}
+                    />
+                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={handleUpdateDescription}
+                      >
+                        Save
+                      </Button>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          setDescriptionValue(task?.description || '');
+                          setEditingDescription(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </Stack>
+                  </Box>
                 ) : (
                   <Box
                     sx={{
@@ -471,16 +509,30 @@ const TaskDrawer = ({ taskId, projectId, organizationId, open, onClose }: TaskDr
                       minHeight: 80,
                       cursor: 'pointer',
                       '&:hover': { bgcolor: 'action.hover' },
+                      '& p': { margin: '0.5em 0' },
+                      '& p:first-of-type': { marginTop: 0 },
+                      '& p:last-child': { marginBottom: 0 },
                     }}
                     onClick={() => setEditingDescription(true)}
                   >
-                    <Typography
-                      variant="body2"
-                      color={task.description ? 'text.primary' : 'text.secondary'}
-                      sx={{ whiteSpace: 'pre-wrap' }}
-                    >
-                      {task.description || 'Add a description...'}
-                    </Typography>
+                    {task.description ? (
+                      <Box
+                        dangerouslySetInnerHTML={{ __html: task.description }}
+                        sx={{
+                          '& .mention': {
+                            color: 'primary.main',
+                            backgroundColor: 'primary.light',
+                            borderRadius: '4px',
+                            padding: '2px 6px',
+                            fontWeight: 500,
+                          },
+                        }}
+                      />
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        Add a description...
+                      </Typography>
+                    )}
                   </Box>
                 )}
               </Box>
