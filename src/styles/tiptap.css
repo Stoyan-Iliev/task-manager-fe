@@ -204,9 +204,44 @@
 }
 
 /* Dark mode support */
+[data-theme="dark"] .comment-editor,
+[data-theme="dark"] .rich-text-editor,
+[data-theme="dark"] .comment-editor p,
+[data-theme="dark"] .rich-text-editor p,
+[data-theme="dark"] .comment-editor h1,
+[data-theme="dark"] .rich-text-editor h1,
+[data-theme="dark"] .comment-editor h2,
+[data-theme="dark"] .rich-text-editor h2,
+[data-theme="dark"] .comment-editor h3,
+[data-theme="dark"] .rich-text-editor h3,
+[data-theme="dark"] .comment-editor li,
+[data-theme="dark"] .rich-text-editor li,
+[data-theme="dark"] .comment-editor strong,
+[data-theme="dark"] .rich-text-editor strong,
+[data-theme="dark"] .comment-editor em,
+[data-theme="dark"] .rich-text-editor em {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+[data-theme="dark"] .comment-editor p.is-editor-empty:first-child::before,
+[data-theme="dark"] .rich-text-editor p.is-editor-empty:first-child::before {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .comment-editor a,
+[data-theme="dark"] .rich-text-editor a {
+  color: #64b5f6;
+}
+
+[data-theme="dark"] .comment-editor a:hover,
+[data-theme="dark"] .rich-text-editor a:hover {
+  color: #90caf9;
+}
+
 [data-theme="dark"] .comment-editor code,
 [data-theme="dark"] .rich-text-editor code {
   background-color: rgba(255, 255, 255, 0.1);
+  color: #f48fb1;
 }
 
 [data-theme="dark"] .comment-editor pre,

@@ -326,7 +326,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
   ) : task ? (
           <>
             {/* Header */}
-            <DialogTitle sx={{ pb: 2 }}>
+            <DialogTitle sx={{ pb: 2, color: 'text.primary' }}>
               <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                 <Box flex={1}>
                   {/* Task Key and Type */}
@@ -391,6 +391,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                         '&:hover': { bgcolor: 'action.hover' },
                         p: 0.5,
                         borderRadius: 1,
+                        color: 'text.primary',
                       }}
                       onClick={() => setEditingTitle(true)}
                     >
@@ -448,7 +449,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                               }}
                             />
                           )}
-                          <Typography>{status.name}</Typography>
+                          <Typography color="text.primary">{status.name}</Typography>
                         </Box>
                       </MenuItem>
                     ))}
@@ -529,6 +530,46 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                       <Box
                         dangerouslySetInnerHTML={{ __html: task.description }}
                         sx={{
+                          color: 'text.primary',
+                          '& p, & h1, & h2, & h3, & li, & strong, & em, & u, & s': {
+                            color: 'inherit',
+                          },
+                          '& a': {
+                            color: 'primary.main',
+                            '&:hover': {
+                              color: 'primary.dark',
+                            },
+                          },
+                          '& code': {
+                            backgroundColor: 'action.hover',
+                            color: 'secondary.main',
+                            borderRadius: '4px',
+                            padding: '2px 6px',
+                            fontFamily: 'monospace',
+                          },
+                          '& pre': {
+                            backgroundColor: 'action.hover',
+                            borderRadius: '4px',
+                            padding: '12px',
+                            overflow: 'auto',
+                            '& code': {
+                              backgroundColor: 'transparent',
+                              padding: 0,
+                            },
+                          },
+                          '& blockquote': {
+                            borderLeft: '3px solid',
+                            borderColor: 'divider',
+                            paddingLeft: '12px',
+                            marginLeft: 0,
+                            color: 'text.secondary',
+                          },
+                          '& hr': {
+                            border: 'none',
+                            borderTop: '2px solid',
+                            borderColor: 'divider',
+                            margin: '16px 0',
+                          },
                           '& .mention': {
                             color: 'primary.main',
                             backgroundColor: 'primary.light',
@@ -580,7 +621,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                           size="small"
                           showTooltip={false}
                         />
-                        <Typography variant="body2">
+                        <Typography variant="body2" color="text.primary">
                           {option.firstName && option.lastName
                             ? `${option.firstName} ${option.lastName}`
                             : option.username}
@@ -699,7 +740,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                   onClick={() => setSubtasksExpanded(!subtasksExpanded)}
                 >
                   <Box display="flex" alignItems="center" gap={1}>
-                    <Typography variant="subtitle2">Subtasks</Typography>
+                    <Typography variant="subtitle2" color="text.primary">Subtasks</Typography>
                     {subtasks && subtasks.length > 0 && (
                       <Chip
                         label={`${subtasks.filter(st => st.status.category === 'DONE').length}/${subtasks.length}`}
@@ -743,11 +784,15 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                                 variant: 'body2',
                                 sx: {
                                   textDecoration: subtask.status.category === 'DONE' ? 'line-through' : 'none',
+                                  color: 'text.primary',
                                 },
                               }}
                               secondaryTypographyProps={{
                                 variant: 'caption',
-                                sx: { fontFamily: 'monospace' },
+                                sx: {
+                                  fontFamily: 'monospace',
+                                  color: 'text.secondary',
+                                },
                               }}
                             />
                           </ListItem>
@@ -801,7 +846,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                   sx={{ cursor: 'pointer' }}
                   onClick={() => setGitExpanded(!gitExpanded)}
                 >
-                  <Typography variant="subtitle2">Git Activity</Typography>
+                  <Typography variant="subtitle2" color="text.primary">Git Activity</Typography>
                   <IconButton size="small">
                     {gitExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                   </IconButton>
@@ -834,7 +879,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                   sx={{ cursor: 'pointer' }}
                   onClick={() => setMetadataExpanded(!metadataExpanded)}
                 >
-                  <Typography variant="subtitle2">Details</Typography>
+                  <Typography variant="subtitle2" color="text.primary">Details</Typography>
                   <IconButton size="small">
                     {metadataExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                   </IconButton>
@@ -862,7 +907,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                         <Typography variant="caption" color="text.secondary">
                           Created at:
                         </Typography>
-                        <Typography variant="caption">
+                        <Typography variant="caption" color="text.primary">
                           {task.createdAt ? new Date(task.createdAt).toLocaleString() : 'N/A'}
                         </Typography>
                       </Box>
@@ -871,7 +916,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                           <Typography variant="caption" color="text.secondary">
                             Updated at:
                           </Typography>
-                          <Typography variant="caption">
+                          <Typography variant="caption" color="text.primary">
                             {new Date(task.updatedAt).toLocaleString()}
                           </Typography>
                         </Box>

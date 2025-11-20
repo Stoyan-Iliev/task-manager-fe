@@ -54,7 +54,7 @@ export const AttachmentList = ({ taskId }: AttachmentListProps) => {
         alignItems="center"
         sx={{ mb: 2 }}
       >
-        <Typography variant="subtitle2">
+        <Typography variant="subtitle2" color="text.primary">
           Attachments ({attachments?.length || 0})
         </Typography>
 

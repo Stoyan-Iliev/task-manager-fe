@@ -50,7 +50,7 @@ export const CommentList = ({ taskId, projectId }: CommentListProps) => {
 
   return (
     <Box>
-      <Typography variant="subtitle2" sx={{ mb: 2 }}>
+      <Typography variant="subtitle2" color="text.primary" sx={{ mb: 2 }}>
         Comments ({comments?.length || 0})
       </Typography>
 

@@ -371,8 +371,12 @@ export const RichTextEditor = ({
             maxHeight: `${maxHeight}px`,
             overflow: 'auto',
             outline: 'none',
+            color: 'text.primary',
             '&:focus': {
               outline: 'none',
+            },
+            '& p, & h1, & h2, & h3, & li, & strong, & em, & u, & s': {
+              color: 'inherit',
             },
             '& p.is-editor-empty:first-of-type::before': {
               color: 'text.disabled',

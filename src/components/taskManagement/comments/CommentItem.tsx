@@ -79,7 +79,7 @@ const CommentItemComponent = ({
             alignItems="center"
             sx={{ mb: 0.5 }}
           >
-            <Typography variant="subtitle2" fontWeight={600}>
+            <Typography variant="subtitle2" fontWeight={600} color="text.primary">
               {comment.author?.firstName && comment.author?.lastName
                 ? `${comment.author.firstName} ${comment.author.lastName}`
                 : comment.author?.username || 'Unknown'}
@@ -129,19 +129,56 @@ const CommentItemComponent = ({
                   p: 1.5,
                   bgcolor: 'action.hover',
                   borderRadius: 1,
+                  color: 'text.primary',
+                  '& p, & h1, & h2, & h3, & li, & strong, & em, & u, & s': {
+                    color: 'inherit',
+                  },
                   '& p': { margin: 0, marginBottom: '0.5em' },
                   '& p:last-child': { marginBottom: 0 },
                   '& ul, & ol': { marginTop: '0.5em', marginBottom: '0.5em', paddingLeft: '1.5em' },
+                  '& a': {
+                    color: 'primary.main',
+                    '&:hover': {
+                      color: 'primary.dark',
+                    },
+                  },
                   '& code': {
                     bgcolor: 'action.selected',
+                    color: 'secondary.main',
                     px: 0.5,
                     py: 0.25,
                     borderRadius: 0.5,
                     fontFamily: 'monospace',
                     fontSize: '0.875em',
                   },
+                  '& pre': {
+                    backgroundColor: 'action.selected',
+                    borderRadius: 1,
+                    padding: '12px',
+                    overflow: 'auto',
+                    '& code': {
+                      backgroundColor: 'transparent',
+                      padding: 0,
+                    },
+                  },
+                  '& blockquote': {
+                    borderLeft: '3px solid',
+                    borderColor: 'divider',
+                    paddingLeft: '12px',
+                    marginLeft: 0,
+                    color: 'text.secondary',
+                  },
+                  '& hr': {
+                    border: 'none',
+                    borderTop: '2px solid',
+                    borderColor: 'divider',
+                    margin: '16px 0',
+                  },
                   '& .mention': {
                     color: 'primary.main',
+                    backgroundColor: 'primary.light',
+                    borderRadius: '4px',
+                    padding: '2px 6px',
                     fontWeight: 600,
                     cursor: 'pointer',
                     '&:hover': {
