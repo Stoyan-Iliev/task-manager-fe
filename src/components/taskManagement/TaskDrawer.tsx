@@ -66,6 +66,7 @@ import SprintSelector from './SprintSelector';
 import { useAssignTasksToSprint, useRemoveTasksFromSprint } from '../../api/sprints';
 import { CommitHistory } from '../gitIntegration/CommitHistory';
 import { PullRequestList } from '../gitIntegration/PullRequestList';
+import { BranchList } from '../gitIntegration/BranchList';
 import UserAvatar from '../misc/UserAvatar';
 import { RichTextEditor, type User } from '../misc/RichTextEditor';
 
@@ -864,6 +865,13 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                       Pull Requests
                     </Typography>
                     <PullRequestList taskId={task.id} />
+
+                    <Divider sx={{ my: 2 }} />
+
+                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                      Branches
+                    </Typography>
+                    <BranchList taskId={task.id} />
                   </Box>
                 </Collapse>
               </Box>

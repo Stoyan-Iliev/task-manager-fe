@@ -87,36 +87,34 @@ export const PullRequestList = ({ taskId }: PullRequestListProps) => {
   return (
     <Box>
       <List dense>
-        {pullRequests.map((pr: PullRequestResponse) => (
-          <ListItem
-            key={pr.id}
-            sx={{
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              py: 1.5,
-              border: 1,
-              borderColor: 'divider',
-              borderRadius: 1,
-              mb: 1,
-              '&:hover': { bgcolor: 'action.hover' },
-            }}
-          >
-            {/* PR Header */}
-            <Box display="flex" width="100%" alignItems="flex-start" gap={1} mb={1}>
-              <Box sx={{ mt: 0.5 }}>{stateIcons[pr.state]}</Box>
+        {pullRequests.map((pr: PullRequestResponse) => {
+          // Use status field from backend
+          const prState = pr.status;
+          // Use authorName if available, otherwise use authorUsername
+          const displayName = pr.authorName || pr.authorUsername;
+
+          return (
+            <ListItem
+              key={pr.id}
+              sx={{
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                py: 1.5,
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                mb: 1,
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
+            >
+              {/* PR Header */}
+              <Box display="flex" width="100%" alignItems="flex-start" gap={1} mb={1}>
+                <Box sx={{ mt: 0.5 }}>{stateIcons[prState]}</Box>
               <Box flex={1}>
                 <Box display="flex" alignItems="center" gap={1} mb={0.5}>
                   <Typography variant="body2" fontWeight={500}>
-                    {pr.title}
+                    {pr.prTitle}
                   </Typography>
-                  {pr.isDraft && (
-                    <Chip
-                      icon={<DraftsIcon sx={{ fontSize: 14 }} />}
-                      label="Draft"
-                      size="small"
-                      sx={{ height: 20, fontSize: '0.7rem' }}
-                    />
-                  )}
                 </Box>
 
                 {/* PR Number and State */}
@@ -124,7 +122,7 @@ export const PullRequestList = ({ taskId }: PullRequestListProps) => {
                   <Chip
                     label={`#${pr.prNumber}`}
                     size="small"
-                    color={stateColors[pr.state]}
+                    color={stateColors[prState]}
                     variant="outlined"
                     sx={{
                       fontFamily: 'monospace',
@@ -133,19 +131,19 @@ export const PullRequestList = ({ taskId }: PullRequestListProps) => {
                     }}
                   />
                   <Typography variant="caption" color="text.secondary">
-                    {pr.state.toLowerCase()}
+                    {prState.toLowerCase()}
                   </Typography>
-                  {pr.state === 'MERGED' && pr.mergedAt && (
+                  {prState === 'MERGED' && pr.mergedAt && (
                     <Typography variant="caption" color="text.secondary">
                       • merged {formatDate(pr.mergedAt)}
                     </Typography>
                   )}
-                  {pr.state === 'CLOSED' && pr.closedAt && (
+                  {prState === 'CLOSED' && pr.closedAt && (
                     <Typography variant="caption" color="text.secondary">
                       • closed {formatDate(pr.closedAt)}
                     </Typography>
                   )}
-                  {pr.state === 'OPEN' && (
+                  {prState === 'OPEN' && (
                     <Typography variant="caption" color="text.secondary">
                       • opened {formatDate(pr.createdAt)}
                     </Typography>
@@ -170,7 +168,7 @@ export const PullRequestList = ({ taskId }: PullRequestListProps) => {
                 </Box>
 
                 {/* Description (if exists) */}
-                {pr.description && (
+                {pr.prDescription && (
                   <Paper
                     elevation={0}
                     sx={{
@@ -191,7 +189,7 @@ export const PullRequestList = ({ taskId }: PullRequestListProps) => {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {pr.description}
+                      {pr.prDescription}
                     </Typography>
                   </Paper>
                 )}
@@ -200,41 +198,24 @@ export const PullRequestList = ({ taskId }: PullRequestListProps) => {
                 <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
                   <Box display="flex" alignItems="center" gap={0.5}>
                     <Avatar
-                      src={pr.authorAvatarUrl || undefined}
                       sx={{ width: 20, height: 20, fontSize: '0.7rem' }}
                     >
-                      {pr.authorName.charAt(0).toUpperCase()}
+                      {displayName.charAt(0).toUpperCase()}
                     </Avatar>
                     <Typography variant="caption" color="text.secondary">
-                      {pr.authorName}
+                      {displayName}
                     </Typography>
                   </Box>
 
                   {/* Stats */}
                   <Stack direction="row" spacing={1.5}>
-                    {pr.commitsCount !== null && (
+                    <Typography variant="caption" color="text.secondary">
+                      {pr.checksCount} {pr.checksCount === 1 ? 'check' : 'checks'}
+                    </Typography>
+                    {pr.approvalsCount > 0 && (
                       <Typography variant="caption" color="text.secondary">
-                        {pr.commitsCount} {pr.commitsCount === 1 ? 'commit' : 'commits'}
+                        {pr.approvalsCount} {pr.approvalsCount === 1 ? 'approval' : 'approvals'}
                       </Typography>
-                    )}
-                    {pr.changedFilesCount !== null && (
-                      <Typography variant="caption" color="text.secondary">
-                        {pr.changedFilesCount} {pr.changedFilesCount === 1 ? 'file' : 'files'} changed
-                      </Typography>
-                    )}
-                    {(pr.additionsCount !== null || pr.deletionsCount !== null) && (
-                      <Box display="flex" gap={0.5}>
-                        {pr.additionsCount !== null && (
-                          <Typography variant="caption" sx={{ color: 'success.main' }}>
-                            +{pr.additionsCount}
-                          </Typography>
-                        )}
-                        {pr.deletionsCount !== null && (
-                          <Typography variant="caption" sx={{ color: 'error.main' }}>
-                            -{pr.deletionsCount}
-                          </Typography>
-                        )}
-                      </Box>
                     )}
                   </Stack>
                 </Box>
@@ -275,7 +256,8 @@ export const PullRequestList = ({ taskId }: PullRequestListProps) => {
               )}
             </Box>
           </ListItem>
-        ))}
+          );
+        })}
       </List>
     </Box>
   );

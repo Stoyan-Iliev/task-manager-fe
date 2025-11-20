@@ -97,37 +97,60 @@ export interface CommitResponse {
 export interface PullRequestResponse {
   id: number;
   gitIntegrationId: number;
+  gitBranchId: number | null;
   prNumber: number;
-  title: string;
-  description: string | null;
-  state: 'OPEN' | 'CLOSED' | 'MERGED';
-  isDraft: boolean;
-
-  // Author info
-  authorName: string;
-  authorAvatarUrl: string | null;
-
-  // Branch info
+  prTitle: string;
+  prDescription: string | null;
+  prUrl: string;
+  status: 'OPEN' | 'CLOSED' | 'MERGED';
   sourceBranch: string;
   targetBranch: string;
+  headCommitSha: string;
+
+  // Author info
+  authorUsername: string;
+  authorName: string | null;
+  authorEmail: string | null;
+
+  // Review info
+  reviewers: string[];
+  approvalsCount: number;
+  requiredApprovals: number | null;
+  approved: boolean | null;
+
+  // Checks
+  checksStatus: string | null;
+  checksCount: number;
+  checksPassed: number;
+  checks: any[];
+  allChecksPassed: boolean;
+
+  // Merge info
+  mergeable: boolean | null;
+  merged: boolean;
+  mergedAt: string | null;
+  mergedBy: string | null;
+  mergeCommitSha: string | null;
+
+  // Linked tasks
+  linkedTaskKeys: string[];
+  closesTask: boolean;
 
   // Dates
   createdAt: string;
   updatedAt: string;
-  mergedAt: string | null;
   closedAt: string | null;
 
-  // External link
-  prUrl: string;
-
-  // Linked tasks
-  linkedTaskKeys: string[];
-
-  // Stats
-  commitsCount: number | null;
-  changedFilesCount: number | null;
-  additionsCount: number | null;
-  deletionsCount: number | null;
+  // Legacy fields for backward compatibility (can be removed later)
+  title?: string;
+  description?: string | null;
+  state?: 'OPEN' | 'CLOSED' | 'MERGED';
+  isDraft?: boolean;
+  authorAvatarUrl?: string | null;
+  commitsCount?: number | null;
+  changedFilesCount?: number | null;
+  additionsCount?: number | null;
+  deletionsCount?: number | null;
 }
 
 export interface BranchResponse {

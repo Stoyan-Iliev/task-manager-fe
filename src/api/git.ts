@@ -6,6 +6,7 @@ import type {
   UpdateGitIntegrationRequest,
   CommitResponse,
   PullRequestResponse,
+  BranchResponse,
 } from '../types/git.types';
 import type { ApiResponse, PageResponse } from '../types/common.types';
 
@@ -23,6 +24,9 @@ export const gitKeys = {
   pullRequests: () => [...gitKeys.all, 'pullRequests'] as const,
   taskPullRequests: (taskId: number) => [...gitKeys.pullRequests(), 'task', taskId] as const,
   projectPullRequests: (projectId: number) => [...gitKeys.pullRequests(), 'project', projectId] as const,
+  branches: () => [...gitKeys.all, 'branches'] as const,
+  taskBranches: (taskId: number) => [...gitKeys.branches(), 'task', taskId] as const,
+  projectBranches: (projectId: number) => [...gitKeys.branches(), 'project', projectId] as const,
 };
 
 // API Functions
@@ -145,6 +149,23 @@ async function fetchTaskPullRequests(taskId: number): Promise<PullRequestRespons
 async function fetchProjectPullRequests(projectId: number, page = 0, size = 20): Promise<PageResponse<PullRequestResponse>> {
   const response = await apiClient.get<ApiResponse<PageResponse<PullRequestResponse>>>(
     `/api/secure/projects/${projectId}/pull-requests`,
+    { params: { page, size } }
+  );
+  return response.data.data || response.data;
+}
+
+// Branches
+
+async function fetchTaskBranches(taskId: number): Promise<BranchResponse[]> {
+  const response = await apiClient.get<ApiResponse<BranchResponse[]>>(
+    `/api/secure/tasks/${taskId}/git-branches`
+  );
+  return response.data.data || response.data || [];
+}
+
+async function fetchProjectBranches(projectId: number, page = 0, size = 20): Promise<PageResponse<BranchResponse>> {
+  const response = await apiClient.get<ApiResponse<PageResponse<BranchResponse>>>(
+    `/api/secure/projects/${projectId}/git-branches`,
     { params: { page, size } }
   );
   return response.data.data || response.data;
@@ -308,6 +329,24 @@ export function useProjectPullRequests(projectId: number | null, page = 0, size 
   return useQuery({
     queryKey: [...gitKeys.projectPullRequests(projectId!), page, size],
     queryFn: () => fetchProjectPullRequests(projectId!, page, size),
+    enabled: !!projectId,
+  });
+}
+
+// Branches
+
+export function useTaskBranches(taskId: number | null) {
+  return useQuery({
+    queryKey: gitKeys.taskBranches(taskId!),
+    queryFn: () => fetchTaskBranches(taskId!),
+    enabled: !!taskId,
+  });
+}
+
+export function useProjectBranches(projectId: number | null, page = 0, size = 20) {
+  return useQuery({
+    queryKey: [...gitKeys.projectBranches(projectId!), page, size],
+    queryFn: () => fetchProjectBranches(projectId!, page, size),
     enabled: !!projectId,
   });
 }
