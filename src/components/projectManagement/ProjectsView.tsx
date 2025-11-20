@@ -103,7 +103,7 @@ const ProjectsView: React.FC = () => {
       try {
         await deleteProjectMutation.mutateAsync(projectId);
       } catch (error) {
-        // Error is handled by mutation's onError
+        // Error handled by mutation's onError
       }
     }
   };
