@@ -287,7 +287,7 @@ const ProjectsView: React.FC = () => {
     );
   }
 
-  // Error state
+  // Error state 1
   if (error) {
     return (
       <>
