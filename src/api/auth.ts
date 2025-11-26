@@ -22,8 +22,8 @@ export const useSignup = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // Store tokens in memory
-      setTokens(data.accessToken, data.refreshToken);
+      // Store tokens in memory with expiry information for proactive refresh
+      setTokens(data.accessToken, data.refreshToken, data.expiresIn);
 
       // Invalidate and refetch user queries
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -48,8 +48,8 @@ export const useLogin = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // Store tokens in memory
-      setTokens(data.accessToken, data.refreshToken);
+      // Store tokens in memory with expiry information for proactive refresh
+      setTokens(data.accessToken, data.refreshToken, data.expiresIn);
 
       // Invalidate and refetch user queries
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -77,8 +77,8 @@ export const useRefreshToken = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      // Update tokens in memory
-      setTokens(data.accessToken, data.refreshToken);
+      // Update tokens in memory with expiry information for proactive refresh
+      setTokens(data.accessToken, data.refreshToken, data.expiresIn);
     },
     onError: (error) => {
       // Clear tokens and redirect to login

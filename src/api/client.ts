@@ -1,4 +1,5 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import { tokenRefreshManager } from './tokenRefreshManager';
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = 'access_token';
@@ -8,26 +9,59 @@ const REFRESH_TOKEN_KEY = 'refresh_token';
 let accessToken: string | null = null;
 let refreshToken: string | null = null;
 
-// Token refresh state
+// Token refresh state for 401 interceptor
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (value?: unknown) => void;
   reject: (reason?: unknown) => void;
 }> = [];
 
+// API base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+
+// Default token expiry (15 minutes in seconds) - used if server doesn't provide expiresIn
+const DEFAULT_TOKEN_EXPIRY_SECONDS = 15 * 60;
+
 // Initialize tokens from localStorage on module load
 const initializeTokens = () => {
   try {
     accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
     refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+
+    // If we have tokens from storage, start the refresh timer with default expiry
+    // The timer will be reset with actual expiry when user logs in or refreshes
+    if (accessToken && refreshToken) {
+      // Parse JWT to get actual expiry if possible
+      const expirySeconds = getTokenExpiryFromJwt(accessToken);
+      if (expirySeconds && expirySeconds > 0) {
+        tokenRefreshManager.startRefreshTimer(expirySeconds);
+      }
+    }
   } catch (error) {
     accessToken = null;
     refreshToken = null;
   }
 };
 
-// Initialize tokens immediately
-initializeTokens();
+/**
+ * Parse JWT and extract remaining time until expiry (in seconds)
+ */
+const getTokenExpiryFromJwt = (token: string): number | null => {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    const payload = JSON.parse(atob(parts[1]));
+    if (!payload.exp) return null;
+
+    const expiryTimestamp = payload.exp * 1000; // Convert to ms
+    const remainingMs = expiryTimestamp - Date.now();
+
+    return Math.max(0, Math.floor(remainingMs / 1000));
+  } catch {
+    return null;
+  }
+};
 
 // Process queued requests
 const processQueue = (error: Error | null, token: string | null = null) => {
@@ -42,8 +76,13 @@ const processQueue = (error: Error | null, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Token management functions
-export const setTokens = (access: string, refresh: string) => {
+/**
+ * Set tokens and start proactive refresh timer
+ * @param access - Access token
+ * @param refresh - Refresh token
+ * @param expiresIn - Optional expiry time in seconds (from server response)
+ */
+export const setTokens = (access: string, refresh: string, expiresIn?: number) => {
   accessToken = access;
   refreshToken = refresh;
 
@@ -52,7 +91,22 @@ export const setTokens = (access: string, refresh: string) => {
     localStorage.setItem(ACCESS_TOKEN_KEY, access);
     localStorage.setItem(REFRESH_TOKEN_KEY, refresh);
   } catch (error) {
+    console.error('Failed to persist tokens to localStorage:', error);
   }
+
+  // Start proactive refresh timer
+  // Use provided expiresIn, or parse from JWT, or use default
+  let expirySeconds = expiresIn;
+
+  if (!expirySeconds) {
+    expirySeconds = getTokenExpiryFromJwt(access) ?? undefined;
+  }
+
+  if (!expirySeconds || expirySeconds <= 0) {
+    expirySeconds = DEFAULT_TOKEN_EXPIRY_SECONDS;
+  }
+
+  tokenRefreshManager.startRefreshTimer(expirySeconds);
 };
 
 export const getAccessToken = () => accessToken;
@@ -63,22 +117,37 @@ export const clearTokens = () => {
   accessToken = null;
   refreshToken = null;
 
+  // Stop refresh timer
+  tokenRefreshManager.onTokensCleared();
+
   // Clear from localStorage
   try {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
   } catch (error) {
+    console.error('Failed to clear tokens from localStorage:', error);
   }
 };
 
 // Create Axios instance
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+  baseURL: API_BASE_URL,
   timeout: parseInt(import.meta.env.VITE_API_TIMEOUT || '10000'),
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Initialize the token refresh manager with required callbacks
+tokenRefreshManager.initialize({
+  getRefreshToken: () => refreshToken,
+  setTokens: setTokens,
+  clearTokens: clearTokens,
+  apiBaseUrl: API_BASE_URL,
+});
+
+// Initialize tokens after manager is set up
+initializeTokens();
 
 // Request interceptor - Add authorization header
 apiClient.interceptors.request.use(
@@ -140,7 +209,25 @@ apiClient.interceptors.response.use(
     }
 
     // If error is 401 and we have a refresh token, try to refresh
+    // This is a fallback in case proactive refresh missed (e.g., network issues)
     if (error.response?.status === 401 && refreshToken && !originalRequest._retry) {
+      // Don't try to refresh if proactive refresh is already in progress
+      if (tokenRefreshManager.refreshInProgress) {
+        // Wait for proactive refresh to complete, then retry
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            if (originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+            }
+            return apiClient(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
       if (isRefreshing) {
         // Another request is already refreshing the token, queue this request
         return new Promise((resolve, reject) => {
@@ -161,6 +248,8 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        console.log('Token interceptor: Performing reactive refresh after 401...');
+
         const response = await axios.post(
           `${apiClient.defaults.baseURL}/api/auth/refresh`,
           { refreshToken },
@@ -173,8 +262,14 @@ apiClient.interceptors.response.use(
           }
         );
 
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
-        setTokens(newAccessToken, newRefreshToken);
+        // Validate response structure
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken, expiresIn } = response.data;
+
+        if (!newAccessToken || !newRefreshToken) {
+          throw new Error('Invalid refresh response: missing tokens');
+        }
+
+        setTokens(newAccessToken, newRefreshToken, expiresIn);
 
         // Process all queued requests with the new token
         processQueue(null, newAccessToken);
@@ -200,5 +295,8 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Re-export token event subscription for components that need it
+export { tokenRefreshManager } from './tokenRefreshManager';
 
 export default apiClient;

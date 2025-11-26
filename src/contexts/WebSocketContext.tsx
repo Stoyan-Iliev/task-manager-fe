@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { Client } from '@stomp/stompjs';
 import type { StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../redux/store';
 import { notificationKeys } from '../api/notifications';
-import { getAccessToken } from '../api/client';
+import { getAccessToken, tokenRefreshManager } from '../api/client';
 import toast from 'react-hot-toast';
 import type { NotificationMessage } from '../types/notification.types';
 
@@ -25,26 +25,16 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
   const clientRef = useRef<Client | null>(null);
   const subscriptionsRef = useRef<Map<string, StompSubscription>>(new Map());
   const queryClient = useQueryClient();
+  const isReconnectingRef = useRef(false);
 
   const user = useSelector((state: RootState) => state.user.details);
   const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
 
-  useEffect(() => {
-    // Only connect if user is authenticated
-    if (!user || !isAuthenticated) {
-      console.log('WebSocket: No user or not authenticated, skipping connection');
-      return;
-    }
-
-    // Get access token from API client
-    const accessToken = getAccessToken();
-
-    if (!accessToken) {
-      console.log('WebSocket: No access token available');
-      return;
-    }
-
-    console.log('WebSocket: Initializing connection...');
+  /**
+   * Create and activate a new WebSocket client
+   */
+  const createClient = useCallback((accessToken: string) => {
+    console.log('WebSocket: Creating new client with fresh token');
 
     const client = new Client({
       webSocketFactory: () =>
@@ -63,6 +53,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     client.onConnect = () => {
       console.log('WebSocket: Connected successfully');
       setConnected(true);
+      isReconnectingRef.current = false;
 
       // Subscribe to user-specific notification queue
       const subscription = client.subscribe(
@@ -106,20 +97,94 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error('WebSocket: Connection error:', event);
     };
 
+    return client;
+  }, [queryClient]);
+
+  /**
+   * Disconnect the current client
+   */
+  const disconnectClient = useCallback(() => {
+    if (clientRef.current) {
+      console.log('WebSocket: Disconnecting current client');
+      clientRef.current.deactivate();
+      clientRef.current = null;
+    }
+    subscriptionsRef.current.clear();
+    setConnected(false);
+  }, []);
+
+  /**
+   * Reconnect WebSocket with new token
+   */
+  const reconnectWithNewToken = useCallback((newAccessToken: string) => {
+    if (isReconnectingRef.current) {
+      console.log('WebSocket: Already reconnecting, skipping');
+      return;
+    }
+
+    isReconnectingRef.current = true;
+    console.log('WebSocket: Reconnecting with new token after refresh');
+
+    // Disconnect existing client
+    disconnectClient();
+
+    // Create and activate new client with fresh token
+    const newClient = createClient(newAccessToken);
+    newClient.activate();
+    clientRef.current = newClient;
+  }, [createClient, disconnectClient]);
+
+  // Main effect: Initialize WebSocket and subscribe to token events
+  useEffect(() => {
+    // Only connect if user is authenticated
+    if (!user || !isAuthenticated) {
+      console.log('WebSocket: No user or not authenticated, skipping connection');
+      disconnectClient();
+      return;
+    }
+
+    // Get access token from API client
+    const accessToken = getAccessToken();
+
+    if (!accessToken) {
+      console.log('WebSocket: No access token available');
+      return;
+    }
+
+    console.log('WebSocket: Initializing connection...');
+
+    // Create and activate the client
+    const client = createClient(accessToken);
     client.activate();
     clientRef.current = client;
 
+    // Subscribe to token refresh events
+    const unsubscribeFromTokenEvents = tokenRefreshManager.subscribe((event) => {
+      console.log('WebSocket: Received token event:', event.type);
+
+      switch (event.type) {
+        case 'TOKEN_REFRESHED':
+          // Reconnect with new token
+          if (event.accessToken) {
+            reconnectWithNewToken(event.accessToken);
+          }
+          break;
+
+        case 'TOKEN_EXPIRED':
+        case 'TOKEN_CLEARED':
+          // Disconnect on token expiry or logout
+          disconnectClient();
+          break;
+      }
+    });
+
     // Cleanup on unmount or when user/token changes
     return () => {
-      console.log('WebSocket: Cleaning up connection');
-      if (clientRef.current) {
-        clientRef.current.deactivate();
-        clientRef.current = null;
-      }
-      subscriptionsRef.current.clear();
-      setConnected(false);
+      console.log('WebSocket: Cleaning up connection and event subscription');
+      unsubscribeFromTokenEvents();
+      disconnectClient();
     };
-  }, [user, isAuthenticated, queryClient]);
+  }, [user, isAuthenticated, createClient, disconnectClient, reconnectWithNewToken]);
 
   const subscribe = (destination: string, callback: (message: any) => void) => {
     if (!clientRef.current?.connected) {
