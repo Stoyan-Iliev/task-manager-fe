@@ -109,7 +109,6 @@ const CreateTaskDialog = ({
     }
   }, [statuses, defaultStatusId, formData.statusId]);
 
-  // Reset form when dialog closes
   useEffect(() => {
     if (!open) {
       setFormData({
