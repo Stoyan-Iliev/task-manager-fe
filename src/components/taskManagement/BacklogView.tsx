@@ -25,10 +25,11 @@ import apiClient from "../../api/client";
 import type { TaskPriority, TaskResponse, TaskSummary } from "../../types/task.types";
 
 const priorityColors: Record<TaskPriority, string> = {
+  LOWEST: "#8bc34a",
   LOW: "#4caf50",
   MEDIUM: "#ff9800",
   HIGH: "#f44336",
-  CRITICAL: "#d32f2f",
+  HIGHEST: "#d32f2f",
 };
 
 const BacklogView: React.FC = () => {

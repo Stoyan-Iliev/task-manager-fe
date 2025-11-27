@@ -4,7 +4,7 @@ import type { BaseEntity, UserSummary } from './common.types';
 export type TaskType = 'TASK' | 'BUG' | 'STORY' | 'EPIC';
 
 // Task priorities
-export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type TaskPriority = 'LOWEST' | 'LOW' | 'MEDIUM' | 'HIGH' | 'HIGHEST';
 
 // Task
 export interface Task extends BaseEntity {

@@ -89,10 +89,11 @@ const typeIcons: Record<TaskType, React.ReactNode> = {
 };
 
 const priorityColors: Record<TaskPriority, string> = {
+  LOWEST: '#8bc34a',
   LOW: '#4caf50',
   MEDIUM: '#ff9800',
   HIGH: '#f44336',
-  CRITICAL: '#d32f2f',
+  HIGHEST: '#d32f2f',
 };
 
 const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose, asPage = false }: TaskDrawerProps) => {
@@ -732,7 +733,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
 
               <Divider sx={{ my: 2 }} />
 
-              {/* Subtasks */}
+              {/* Subtasks
               <Box mb={2}>
                 <Box
                   display="flex"
@@ -815,9 +816,9 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                     </Button>
                   </Box>
                 </Collapse>
-              </Box>
+              </Box> */}
 
-              <Divider sx={{ my: 2 }} />
+              {/* <Divider sx={{ my: 2 }} /> */}
 
               {/* Watchers Section */}
               <Box mb={2}>
