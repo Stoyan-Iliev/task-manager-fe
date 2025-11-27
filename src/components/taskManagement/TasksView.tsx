@@ -1093,7 +1093,7 @@ const TasksView = () => {
 
         {/* Swimlanes */}
         {swimlanes.map((swimlane) => (
-          <Box key={swimlane.id} mb={swimlaneGrouping !== 'none' ? 4 : 0}>
+          <Box key={swimlane.id} mb={swimlaneGrouping !== 'none' ? 4 : 0} sx={{ overflow: "auto"}}>
             {swimlaneGrouping !== 'none' && (
               <>
                 <Typography variant="h6" fontWeight={600} color="text.primary" mb={2}>

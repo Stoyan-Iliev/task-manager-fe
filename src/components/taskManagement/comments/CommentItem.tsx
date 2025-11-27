@@ -14,6 +14,7 @@ import { formatDistanceToNow } from 'date-fns';
 import type { CommentResponse } from '../../../types/task.types';
 import type { ProjectMemberResponse } from '../../../types/project.types';
 import UserAvatar from '../../misc/UserAvatar';
+import { sanitizeHtml } from '../../../util/sanitize';
 
 interface CommentItemProps {
   comment: CommentResponse;
@@ -186,7 +187,7 @@ const CommentItemComponent = ({
                     },
                   },
                 }}
-                dangerouslySetInnerHTML={{ __html: comment.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(comment.content) }}
               />
 
               {/* Reply Button */}

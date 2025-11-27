@@ -26,4 +26,5 @@ body {
 
 html, #root, body {
   width: 100%;
+  background-color: rgb(100, 100, 100);
 }

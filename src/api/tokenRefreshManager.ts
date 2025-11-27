@@ -154,8 +154,9 @@ class TokenRefreshManager {
         }
       );
 
-      // Validate response structure
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken, expiresIn } = response.data;
+      // Unwrap ApiResponse format (backend returns { success: true, data: { ... } })
+      const responseData = response.data.success ? response.data.data : response.data;
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken, expiresIn } = responseData;
 
       if (!newAccessToken || !newRefreshToken) {
         throw new Error('Invalid refresh response: missing tokens');

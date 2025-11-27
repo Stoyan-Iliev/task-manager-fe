@@ -69,6 +69,7 @@ import { PullRequestList } from '../gitIntegration/PullRequestList';
 import { BranchList } from '../gitIntegration/BranchList';
 import UserAvatar from '../misc/UserAvatar';
 import { RichTextEditor, type User } from '../misc/RichTextEditor';
+import { sanitizeHtml } from '../../util/sanitize';
 
 interface TaskDrawerProps {
   taskId?: number | null;
@@ -529,7 +530,7 @@ const TaskDrawer = ({ taskId, taskKey, projectId, organizationId, open, onClose,
                   >
                     {task.description ? (
                       <Box
-                        dangerouslySetInnerHTML={{ __html: task.description }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(task.description) }}
                         sx={{
                           color: 'text.primary',
                           '& p, & h1, & h2, & h3, & li, & strong, & em, & u, & s': {

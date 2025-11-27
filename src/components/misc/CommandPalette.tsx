@@ -201,18 +201,6 @@ const CommandPalette = ({ open, onClose, onOpenShortcuts }: CommandPaletteProps)
         },
         category: 'help',
       },
-      {
-        id: 'help-docs',
-        label: 'Help & Documentation',
-        description: 'View help documentation',
-        icon: <HelpOutlineIcon />,
-        keywords: ['help', 'docs', 'documentation', 'support'],
-        action: () => {
-          window.open('https://docs.claude.com', '_blank');
-          onClose();
-        },
-        category: 'help',
-      },
     ],
     [navigate, onClose, onOpenShortcuts, currentProject]
   );

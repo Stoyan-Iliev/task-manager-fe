@@ -117,6 +117,7 @@ export const BranchList = ({ taskId }: BranchListProps) => {
                 <Typography
                   variant="body2"
                   fontWeight={500}
+                  color="text.primary"
                   sx={{
                     fontFamily: 'monospace',
                     wordBreak: 'break-all',

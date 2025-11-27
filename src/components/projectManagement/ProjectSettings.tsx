@@ -105,7 +105,7 @@ const ProjectSettings = () => {
     }
 
     updateProject.mutate(
-      { id: parsedProjectId, data: updates },
+      { id: parsedProjectId, data: formData },
       {
         onSuccess: () => setHasChanges(false),
       }
