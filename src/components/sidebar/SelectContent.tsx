@@ -132,6 +132,21 @@ export default function SelectContent() {
           alignItems: 'center',
           gap: '2px',
           pl: 1,
+
+          minWidth: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+
+          '& .MuiListItemText-root': {
+            minWidth: 0,
+            overflow: 'hidden',
+          },
+          '& .MuiListItemText-primary': {
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          },
         },
       }}
     >

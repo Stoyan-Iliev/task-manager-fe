@@ -120,6 +120,7 @@ export const CommitHistory = ({ taskId }: CommitHistoryProps) => {
                 </Tooltip>
                 <Typography
                   variant="body2"
+                  color="text.primary"
                   sx={{
                     flex: 1,
                     cursor: 'pointer',

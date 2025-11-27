@@ -153,15 +153,20 @@ export interface PullRequestResponse {
   deletionsCount?: number | null;
 }
 
+export type BranchStatus = 'ACTIVE' | 'MERGED' | 'DELETED';
+
 export interface BranchResponse {
   id: number;
   gitIntegrationId: number;
-  name: string;
-  isDefault: boolean;
-  isProtected: boolean;
-  lastCommitSha: string | null;
-  lastCommitMessage: string | null;
-  lastCommitDate: string | null;
+  taskId: number;
+  taskKey: string;
+  branchName: string;
+  branchUrl: string | null;
+  status: BranchStatus;
+  baseBranch: string | null;
+  headCommitSha: string | null;
   createdAt: string;
-  linkedTaskKeys: string[];
+  createdByUsername: string | null;
+  mergedAt: string | null;
+  deletedAt: string | null;
 }

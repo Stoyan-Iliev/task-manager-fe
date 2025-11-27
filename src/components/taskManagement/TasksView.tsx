@@ -86,17 +86,19 @@ interface QuickFilters {
 }
 
 const priorityColors: Record<TaskPriority, string> = {
+  LOWEST: '#8bc34a',
   LOW: '#4caf50',
   MEDIUM: '#ff9800',
   HIGH: '#f44336',
-  CRITICAL: '#9c27b0',
+  HIGHEST: '#9c27b0',
 };
 
 const priorityLabels: Record<TaskPriority, string> = {
+  LOWEST: 'Lowest',
   LOW: 'Low',
   MEDIUM: 'Medium',
   HIGH: 'High',
-  CRITICAL: 'Critical',
+  HIGHEST: 'Highest',
 };
 
 const typeIcons: Record<TaskType, React.ReactNode> = {
@@ -343,7 +345,7 @@ const TasksView = () => {
 
         return Array.from(grouped.entries())
           .sort((a, b) => {
-            const order: TaskPriority[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
+            const order: TaskPriority[] = ['HIGHEST', 'HIGH', 'MEDIUM', 'LOW', 'LOWEST'];
             return order.indexOf(a[0]) - order.indexOf(b[0]);
           })
           .map(([priority, tasks]) => ({
@@ -1093,7 +1095,37 @@ const TasksView = () => {
 
         {/* Swimlanes */}
         {swimlanes.map((swimlane) => (
-          <Box key={swimlane.id} mb={swimlaneGrouping !== 'none' ? 4 : 0}>
+          <Box
+              key={swimlane.id}
+              mb={swimlaneGrouping !== 'none' ? 4 : 0}
+              sx={{
+                overflow: 'auto',
+                '&::-webkit-scrollbar': {
+                  width: '8px',
+                  height: '8px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? theme.palette.grey[900]
+                      : theme.palette.grey[200],
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? theme.palette.grey[700]
+                      : theme.palette.grey[400],
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? theme.palette.grey[600]
+                      : theme.palette.grey[500],
+                },
+              }}
+            >
             {swimlaneGrouping !== 'none' && (
               <>
                 <Typography variant="h6" fontWeight={600} color="text.primary" mb={2}>
@@ -1185,7 +1217,7 @@ const TasksView = () => {
                     displayEmpty
                     disabled={availablePriorities.length === 0}
                   >
-                    {['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map((priority) => (
+                    {['HIGHEST', 'HIGH', 'MEDIUM', 'LOW', 'LOWEST'].map((priority) => (
                       <MenuItem key={priority} value={priority}>
                         <Checkbox checked={filters.priorities.includes(priority as TaskPriority)} />
                         <ListItemText primary={priorityLabels[priority as TaskPriority]} />

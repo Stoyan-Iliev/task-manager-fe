@@ -81,7 +81,7 @@ const Dashboard = () => {
         icon: <GroupRoundedIcon />,
         description: 'Active organization members',
         trend: 'Stable',
-        path: '/organization/members',
+        path: '/team',
         color: theme.palette.secondary.main,
       },
     ];

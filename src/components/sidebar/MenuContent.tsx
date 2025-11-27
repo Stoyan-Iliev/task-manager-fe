@@ -10,13 +10,13 @@ import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import FolderRoundedIcon from '@mui/icons-material/FolderRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import QueueRoundedIcon from '@mui/icons-material/QueueRounded';
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+// import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import TimelineRoundedIcon from '@mui/icons-material/TimelineRounded';
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import NewReleasesRoundedIcon from '@mui/icons-material/NewReleasesRounded';
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
-import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded';
+// import BarChartRoundedIcon from '@mui/icons-material/BarChartRounded';
 import BusinessIcon from '@mui/icons-material/Business';
 import { selectCurrentOrganizationId } from '../../redux/organizationSlice';
 
@@ -28,7 +28,7 @@ const mainListItems = [
   { text: 'Sprints', icon: <TimelineRoundedIcon />, path: '/sprints' },
   { text: 'Team', icon: <GroupRoundedIcon />, path: '/team' },
   { text: 'Releases', icon: <NewReleasesRoundedIcon />, path: '/releases' },
-  { text: 'Reports', icon: <BarChartRoundedIcon />, path: '/reports' },
+  // { text: 'Reports', icon: <BarChartRoundedIcon />, path: '/reports' },
   { text: "Search", icon: <SearchRoundedIcon />, path: "/search" },
   { text: 'Notifications', icon: <NotificationsRoundedIcon />, path: '/notifications' },
 ];
@@ -48,7 +48,7 @@ export default function MenuContent() {
           },
         ]
       : []),
-    { text: 'Settings', icon: <SettingsRoundedIcon />, path: '/settings' },
+    // { text: 'Settings', icon: <SettingsRoundedIcon />, path: '/settings' },
   ];
 
   return (

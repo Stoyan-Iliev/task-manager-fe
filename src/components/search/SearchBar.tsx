@@ -33,7 +33,7 @@ export const SearchBar = ({
   onSearch,
   onResultSelect,
   onFilterClick,
-  placeholder = 'Search tasks, projects, and users...',
+  placeholder = 'Search tasks, projects',
   showSuggestions = true,
   autoFocus = false,
   value: controlledValue,

@@ -142,7 +142,7 @@ const ProjectDetailsPage: React.FC = () => {
         Back to Projects
       </Button>
 
-      <Paper sx={{ p: 3, borderRadius: 2 }}>
+            <Paper sx={{ p: 3, borderRadius: 2 }}>
         {/* Project Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -183,10 +183,22 @@ const ProjectDetailsPage: React.FC = () => {
         </Box>
 
         {/* Project Details Grid */}
-        <Grid container spacing={3}>
+       <Grid container spacing={3}>
           {/* Project Lead */}
           <Grid size={{ xs: 12, md: 6 }}>
-            <Card sx={{ height: '100%' }}>
+            <Card
+              sx={{
+                p: 2,
+                boxShadow: 3,
+                borderRadius: 2,
+                height: '100%',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? theme.palette.background.paper
+                    : theme.palette.action.hover,
+                border: (theme) => `1px solid ${theme.palette.divider}`,
+              }}
+            >
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                   <PersonIcon color="primary" />
@@ -212,7 +224,19 @@ const ProjectDetailsPage: React.FC = () => {
 
           {/* Project Timeline */}
           <Grid size={{ xs: 12, md: 6 }}>
-            <Card sx={{ height: '100%' }}>
+            <Card
+              sx={{
+                p: 2,
+                boxShadow: 3,
+                borderRadius: 2,
+                height: '100%',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? theme.palette.background.paper
+                    : theme.palette.action.hover,
+                border: (theme) => `1px solid ${theme.palette.divider}`,
+              }}
+            >
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                   <CalendarTodayIcon color="primary" />
@@ -232,7 +256,19 @@ const ProjectDetailsPage: React.FC = () => {
 
           {/* Project Statistics */}
           <Grid size={{ xs: 12, md: 6 }}>
-            <Card sx={{ height: '100%' }}>
+            <Card
+              sx={{
+                p: 2,
+                boxShadow: 3,
+                borderRadius: 2,
+                height: '100%',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? theme.palette.background.paper
+                    : theme.palette.action.hover,
+                border: (theme) => `1px solid ${theme.palette.divider}`,
+              }}
+            >
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Statistics
@@ -251,7 +287,19 @@ const ProjectDetailsPage: React.FC = () => {
 
           {/* Project Info */}
           <Grid size={{ xs: 12, md: 6 }}>
-            <Card sx={{ height: '100%' }}>
+            <Card
+              sx={{
+                p: 2,
+                boxShadow: 3,
+                borderRadius: 2,
+                height: '100%',
+                bgcolor: (theme) =>
+                  theme.palette.mode === 'dark'
+                    ? theme.palette.background.paper
+                    : theme.palette.action.hover,
+                border: (theme) => `1px solid ${theme.palette.divider}`,
+              }}
+            >
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Project Information

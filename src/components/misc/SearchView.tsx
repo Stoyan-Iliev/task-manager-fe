@@ -156,7 +156,7 @@ const SearchView = () => {
           onSearch={handleSearch}
           onResultSelect={handleResultSelect}
           onFilterClick={() => setFilterDialogOpen(true)}
-          placeholder="Search tasks, projects, and users..."
+          placeholder="Search tasks, projects"
           showSuggestions={true}
           autoFocus={true}
           value={query}

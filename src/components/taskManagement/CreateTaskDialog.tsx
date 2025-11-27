@@ -65,10 +65,11 @@ const taskTypes: { value: TaskType; label: string }[] = [
 ];
 
 const priorities: { value: TaskPriority; label: string }[] = [
+  { value: 'LOWEST', label: 'Lowest' },
   { value: 'LOW', label: 'Low' },
   { value: 'MEDIUM', label: 'Medium' },
   { value: 'HIGH', label: 'High' },
-  { value: 'CRITICAL', label: 'Critical' },
+  { value: 'HIGHEST', label: 'Highest' },
 ];
 
 const CreateTaskDialog = ({
@@ -208,6 +209,7 @@ const CreateTaskDialog = ({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      sx={{zIndex: 3000}}
       onKeyDown={handleKeyDown}
       PaperProps={{
         sx: {

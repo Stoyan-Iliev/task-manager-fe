@@ -112,7 +112,7 @@ export const PullRequestList = ({ taskId }: PullRequestListProps) => {
                 <Box sx={{ mt: 0.5 }}>{stateIcons[prState]}</Box>
               <Box flex={1}>
                 <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} color="text.primary">
                     {pr.prTitle}
                   </Typography>
                 </Box>
