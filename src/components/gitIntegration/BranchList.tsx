@@ -7,14 +7,12 @@ import {
   Tooltip,
   CircularProgress,
   Alert,
-  Stack,
+  IconButton,
 } from '@mui/material';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import StarIcon from '@mui/icons-material/Star';
-import LockIcon from '@mui/icons-material/Lock';
-import CommitIcon from '@mui/icons-material/Commit';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useTaskBranches } from '../../api/git';
-import type { BranchResponse } from '../../types/git.types';
+import type { BranchResponse, BranchStatus } from '../../types/git.types';
 
 interface BranchListProps {
   taskId: number;
@@ -34,6 +32,31 @@ const formatDate = (dateString: string | null) => {
   if (diffHours < 24) return `${diffHours} hours ago`;
   if (diffDays < 7) return `${diffDays} days ago`;
   return date.toLocaleDateString();
+};
+
+const getStatusColor = (status: BranchStatus): 'success' | 'secondary' | 'default' => {
+  switch (status) {
+    case 'ACTIVE':
+      return 'success';
+    case 'MERGED':
+      return 'secondary';
+    case 'DELETED':
+    default:
+      return 'default';
+  }
+};
+
+const getStatusLabel = (status: BranchStatus): string => {
+  switch (status) {
+    case 'ACTIVE':
+      return 'Active';
+    case 'MERGED':
+      return 'Merged';
+    case 'DELETED':
+      return 'Deleted';
+    default:
+      return status;
+  }
 };
 
 export const BranchList = ({ taskId }: BranchListProps) => {
@@ -75,9 +98,8 @@ export const BranchList = ({ taskId }: BranchListProps) => {
           <ListItem
             key={branch.id}
             sx={{
-              flexDirection: 'column',
-              alignItems: 'flex-start',
               py: 1.5,
+              px: 2,
               border: 1,
               borderColor: 'divider',
               borderRadius: 1,
@@ -85,108 +107,54 @@ export const BranchList = ({ taskId }: BranchListProps) => {
               '&:hover': { bgcolor: 'action.hover' },
             }}
           >
-            {/* Branch Header */}
-            <Box display="flex" width="100%" alignItems="flex-start" gap={1} mb={1}>
-              <AccountTreeIcon sx={{ fontSize: 18, color: 'text.secondary', mt: 0.3 }} />
-              <Box flex={1}>
-                <Box display="flex" alignItems="center" gap={1} flexWrap="wrap" mb={0.5}>
-                  <Typography variant="body2" fontWeight={500} sx={{ fontFamily: 'monospace' }}>
-                    {branch.name}
-                  </Typography>
+            {/* Branch Icon */}
+            <AccountTreeIcon sx={{ fontSize: 20, color: 'text.secondary', mr: 1.5 }} />
 
-                  {/* Branch Badges */}
-                  {branch.isDefault && (
-                    <Tooltip title="Default branch" arrow>
-                      <Chip
-                        icon={<StarIcon sx={{ fontSize: 14 }} />}
-                        label="Default"
-                        size="small"
-                        color="primary"
-                        sx={{ height: 20, fontSize: '0.7rem' }}
-                      />
-                    </Tooltip>
-                  )}
-
-                  {branch.isProtected && (
-                    <Tooltip title="Protected branch" arrow>
-                      <Chip
-                        icon={<LockIcon sx={{ fontSize: 14 }} />}
-                        label="Protected"
-                        size="small"
-                        color="warning"
-                        sx={{ height: 20, fontSize: '0.7rem' }}
-                      />
-                    </Tooltip>
-                  )}
-                </Box>
-
-                {/* Last Commit Info */}
-                {branch.lastCommitSha && (
-                  <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                    <CommitIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                    <Tooltip title={branch.lastCommitSha} arrow>
-                      <Chip
-                        label={branch.lastCommitSha.substring(0, 7)}
-                        size="small"
-                        variant="outlined"
-                        sx={{
-                          fontFamily: 'monospace',
-                          height: 20,
-                          fontSize: '0.7rem',
-                        }}
-                      />
-                    </Tooltip>
-                    {branch.lastCommitDate && (
-                      <Typography variant="caption" color="text.secondary">
-                        • {formatDate(branch.lastCommitDate)}
-                      </Typography>
-                    )}
-                  </Box>
-                )}
-
-                {/* Last Commit Message */}
-                {branch.lastCommitMessage && (
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{
-                      display: 'block',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      maxWidth: '100%',
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    {branch.lastCommitMessage}
-                  </Typography>
-                )}
-
-                {/* Other Linked Tasks */}
-                {branch.linkedTaskKeys && branch.linkedTaskKeys.length > 1 && (
-                  <Box display="flex" flexWrap="wrap" gap={0.5} mt={1}>
-                    <Typography variant="caption" color="text.secondary">
-                      Also linked to:
-                    </Typography>
-                    {branch.linkedTaskKeys
-                      .filter((key) => key !== taskId.toString())
-                      .map((taskKey) => (
-                        <Chip
-                          key={taskKey}
-                          label={taskKey}
-                          size="small"
-                          sx={{ height: 18, fontSize: '0.65rem', fontFamily: 'monospace' }}
-                        />
-                      ))}
-                  </Box>
-                )}
-
-                {/* Created Date */}
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                  Created {formatDate(branch.createdAt)}
+            {/* Branch Info */}
+            <Box flex={1} minWidth={0}>
+              {/* Branch Name and Status */}
+              <Box display="flex" alignItems="center" gap={1} flexWrap="wrap" mb={0.5}>
+                <Typography
+                  variant="body2"
+                  fontWeight={500}
+                  sx={{
+                    fontFamily: 'monospace',
+                    wordBreak: 'break-all',
+                  }}
+                >
+                  {branch.branchName}
                 </Typography>
+                <Chip
+                  label={getStatusLabel(branch.status)}
+                  size="small"
+                  color={getStatusColor(branch.status)}
+                  sx={{ height: 20, fontSize: '0.7rem' }}
+                />
               </Box>
+
+              {/* Created By and Date */}
+              <Typography variant="caption" color="text.secondary">
+                {branch.createdByUsername
+                  ? `Created by ${branch.createdByUsername} ${formatDate(branch.createdAt)}`
+                  : `Created ${formatDate(branch.createdAt)}`}
+              </Typography>
             </Box>
+
+            {/* External Link Button */}
+            {branch.branchUrl && (
+              <Tooltip title="View branch on Git provider" arrow>
+                <IconButton
+                  size="small"
+                  component="a"
+                  href={branch.branchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ ml: 1 }}
+                >
+                  <OpenInNewIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
           </ListItem>
         ))}
       </List>
